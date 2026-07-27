@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .app {
+            background: hsl(0, 52%, 80%);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #taskInput:focus {
+            border-color: #667eea;
+        }
+
+        #addBtn {
+            padding: 12px 20px;
+            background: #667eea;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #addBtn:hover {
+            background: #5a6fd6;
+        }
+
+        .options-row {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+
+        .option-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .option-field label {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .option-field select, .option-field input {
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        #taskList {
+            list-style: none;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: background 0.2s;
+            border-left: 5px solid transparent;
+        }
+
+        .task-item.priority-high {
+            border-left-color: #ff4757;
+        }
+        .task-item.priority-medium {
+            border-left-color: #ffa502;
+        }
+        .task-item.priority-low {
+            border-left-color: #2ed573;
+        }
+
+        .task-item:hover {
+            background: #eef0f5;
+        }
+
+        .task-item.completed span {
+            text-decoration: line-through;
+            color: #aaa;
+        }
+
+        .task-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .task-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .task-item span {
+            font-size: 15px;
+            color: #333;
+            word-break: break-word;
+        }
+
+        .task-date {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .delete-btn:hover {
+            background: #e84118;
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: #aaa;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .filter-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            background: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .filter-btn.active {
+            border-color: #667eea;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .clear-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: #eee;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .clear-btn:hover {
+            background: #ddd;
+        }
+
+        /* Sandbox Warning Notification styling */
+        .sandbox-warning {
+            display: none;
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-bottom: 15px;
+            border: 1px solid #ffeeba;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <h1>My Todo List</h1>
+        <p class="subtitle">Stay organized, Melkamu!</p>
+
+        <!-- Sandbox alert notification (shows only if localStorage is blocked by Google Drive) -->
+        <div id="sandboxAlert" class="sandbox-warning">
+            <!-- Note: Running in sandboxed preview. Tasks will save temporarily during this session. -->
+        </div>
+
+        <div class="input-section">
+            <div class="input-row">
+                <input type="text" id="taskInput" placeholder="Add a new task...">
+                <button id="addBtn">Add</button>
+            </div>
+            <div class="options-row">
+                <div class="option-field">
+                    <label for="priorityInput">Priority:</label>
+                    <select id="priorityInput">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                </div>
+                <div class="option-field">
+                    <label for="dateInput">Due Date:</label>
+                    <input type="date" id="dateInput">
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <span id="taskCount">0 tasks</span>
+            <span id="doneCount">0 done</span>
+        </div>
+
+        <ul id="taskList"></ul>
+
+        <div class="filter-row">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="active">Active</button>
+            <button class="filter-btn" data-filter="done">Done</button>
+        </div>
+
+        <button class="clear-btn" id="clearDone">Clear completed</button>
+    </div>
+
+    <script>
+        let tasks = [];
+        let isLocalStorageAvailable = false;
+
+        // STEP 1: Safely test if localStorage is allowed/working in this environment
+        try {
+            const testKey = "__localstorage_test__";
+            localStorage.setItem(testKey, testKey);
+            localStorage.removeItem(testKey);
+            isLocalStorageAvailable = true;
+        } catch (e) {
+            console.warn("localStorage is blocked by sandbox. Switching to memory-safe fallback.");
+            isLocalStorageAvailable = false;
+        }
+
+        // STEP 2: Load existing tasks if localStorage is active
+        if (isLocalStorageAvailable) {
+            try {
+                tasks = JSON.parse(localStorage.getItem("todoTasks") || "[]");
+                if (!Array.isArray(tasks)) tasks = [];
+            } catch (e) {
+                tasks = [];
+            }
+        } else {
+            // Show the user a polite notice that we are safely running in sandbox mode
+            document.addEventListener("DOMContentLoaded", function() {
+                const alertBox = document.getElementById("sandboxAlert");
+                if (alertBox) alertBox.style.display = "block";
+            });
+        }
+
+        let currentFilter = "all";
+
+        // DOM Element selectors
+        let taskInput = document.getElementById("taskInput");
+        let priorityInput = document.getElementById("priorityInput");
+        let dateInput = document.getElementById("dateInput");
+        let addBtn = document.getElementById("addBtn");
+        let taskList = document.getElementById("taskList");
+        let taskCount = document.getElementById("taskCount");
+        let doneCount = document.getElementById("doneCount");
+        let clearDoneBtn = document.getElementById("clearDone");
+        let filterBtns = document.querySelectorAll(".filter-btn");
+
+        function saveTasks() {
+            if (isLocalStorageAvailable) {
+                try {
+                    localStorage.setItem("todoTasks", JSON.stringify(tasks));
+                } catch (e) {
+                    console.error("Failed to write to localStorage:", e);
+                }
+            }
+        }
+
+        function addTask(text) {
+            let trimmed = text.trim();
+            if (!trimmed) return;
+
+            let priority = priorityInput ? priorityInput.value : "medium";
+            let dueDate = dateInput ? dateInput.value : "";
+
+            tasks.push({
+                id: Date.now(),
+                text: trimmed,
+                priority: priority,
+                dueDate: dueDate,
+                completed: false
+            });
+
+            saveTasks();
+            renderTasks();
+            
+            // Reset inputs
+            taskInput.value = "";
+            if (dateInput) dateInput.value = "";
+            if (priorityInput) priorityInput.value = "medium";
+            taskInput.focus();
+        }
+
+        function toggleTask(id) {
+            tasks = tasks.map(function (task) {
+                if (task.id === id) {
+                    task.completed = !task.completed;
+                }
+                return task;
+            });
+            saveTasks();
+            renderTasks();
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(function (task) {
+                return task.id !== id;
+            });
+            saveTasks();
+            renderTasks();
+        }
+
+        function clearCompleted() {
+            tasks = tasks.filter(function (task) {
+                return !task.completed;
+            });
+            saveTasks();
+            renderTasks();
+        }
+
+        function getFilteredTasks() {
+            if (currentFilter === "active") {
+                return tasks.filter(function (task) { return !task.completed; });
+            }
+            if (currentFilter === "done") {
+                return tasks.filter(function (task) { return task.completed; });
+            }
+            return tasks;
+        }
+
+        function renderTasks() {
+            let filtered = getFilteredTasks();
+            taskList.innerHTML = "";
+
+            if (filtered.length === 0) {
+                taskList.innerHTML = '<li class="empty-msg">No tasks here. Add one above!</li>';
+            } else {
+                filtered.forEach(function (task) {
+                    let li = document.createElement("li");
+                    let taskPriority = task.priority || "medium";
+                    li.className = "task-item priority-" + taskPriority + (task.completed ? " completed" : "");
+
+                    let checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.checked = task.completed;
+                    checkbox.addEventListener("change", function () {
+                        toggleTask(task.id);
+                    });
+
+                    let detailsDiv = document.createElement("div");
+                    detailsDiv.className = "task-details";
+
+                    let span = document.createElement("span");
+                    span.textContent = task.text;
+                    detailsDiv.appendChild(span);
+
+                    if (task.dueDate) {
+                        let dateSpan = document.createElement("small");
+                        dateSpan.className = "task-date";
+                        dateSpan.textContent = "📅 Due: " + task.dueDate;
+                        detailsDiv.appendChild(dateSpan);
+                    }
+
+                    let deleteBtn = document.createElement("button");
+                    deleteBtn.className = "delete-btn";
+                    deleteBtn.textContent = "Delete";
+                    deleteBtn.addEventListener("click", function () {
+                        deleteTask(task.id);
+                    });
+
+                    li.appendChild(checkbox);
+                    li.appendChild(detailsDiv);
+                    li.appendChild(deleteBtn);
+                    taskList.appendChild(li);
+                });
+            }
+
+            let done = tasks.filter(function (t) { return t.completed; }).length;
+            taskCount.textContent = tasks.length + " task" + (tasks.length !== 1 ? "s" : "");
+            doneCount.textContent = done + " done";
+        }
+
+        // Event Listeners setup
+        addBtn.addEventListener("click", function () {
+            addTask(taskInput.value);
+        });
+
+        taskInput.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                addTask(taskInput.value);
+            }
+        });
+
+        clearDoneBtn.addEventListener("click", clearCompleted);
+
+        filterBtns.forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                filterBtns.forEach(function (b) { b.classList.remove("active"); });
+                btn.classList.add("active");
+                currentFilter = btn.dataset.filter;
+                renderTasks();
+            });
+        });
+
+        // First render on load
+        renderTasks();
+    </script>
+</body>
+</html>
