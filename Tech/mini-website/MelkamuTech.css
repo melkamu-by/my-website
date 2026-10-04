@@ -1,0 +1,185 @@
+:root {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+header > div {
+    gap: 1.5rem;
+}
+
+header nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+}
+
+header nav a {
+    text-decoration: none;
+    text-underline-offset: 0.3em;
+}
+
+header nav a:focus-visible,
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid #67e8f9;
+    outline-offset: 4px;
+}
+
+#home {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-inline: 1.5rem;
+}
+
+#home p,
+#about p,
+#contact > div > p {
+    line-height: 1.8;
+}
+
+#projects .grid > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 180ms ease, border-color 180ms ease;
+}
+
+#projects .grid > div > p {
+    flex: 1;
+}
+
+#projects .project-link {
+    align-self: flex-start;
+    margin-top: 1.25rem;
+}
+
+#projects .grid > div:hover {
+    border-color: rgb(103 232 249 / 55%);
+}
+
+#contact form input,
+#contact form textarea {
+    box-sizing: border-box;
+    font: inherit;
+}
+
+#contact form textarea {
+    resize: vertical;
+}
+
+#contact form input:focus-visible,
+#contact form textarea:focus-visible {
+    outline: 2px solid #67e8f9;
+    outline-offset: 2px;
+}
+
+button {
+    cursor: pointer;
+}
+
+#contact-status {
+    min-height: 1.5rem;
+    color: #67e8f9;
+}
+
+.doc-card {
+    margin-bottom: 2.5rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid rgb(107 114 128 / 25%);
+    background: linear-gradient(to bottom right, rgb(17 24 39 / 80%), #000);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 30%);
+}
+
+.doc-card h4 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.doc-card > p,
+.doc-card li {
+    color: #9ca3af;
+    line-height: 1.75;
+}
+
+.doc-card ul {
+    list-style: disc inside;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.doc-card strong {
+    color: #fff;
+}
+
+.doc-tile {
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    background: rgb(0 0 0 / 50%);
+}
+
+.doc-tile h5 {
+    font-weight: 600;
+    color: #22d3ee;
+}
+
+.doc-tile p {
+    margin-top: 0.5rem;
+    color: #9ca3af;
+}
+
+.doc-card pre {
+    overflow-x: auto;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    background: #000;
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+    header > div {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    header nav {
+        gap: 0.5rem 1rem;
+    }
+
+    #home {
+        min-height: auto;
+        padding-block: 4rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
