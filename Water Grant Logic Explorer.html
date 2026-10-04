@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Grant Eligibility Logic Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfbf7;
+            color: #2d3436;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        .logic-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .logic-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .status-full { background-color: #d1fae5; color: #065f46; }
+        .status-partial { background-color: #fef3c7; color: #92400e; }
+        .status-declined { background-color: #fee2e2; color: #991b1b; }
+
+        input[type="range"] {
+            accent-color: #0d9488;
+        }
+
+        .code-block {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Chosen Palette: Andean Sands (Warm neutrals with teal/water accents) -->
+    
+    <!-- Application Structure Plan: 
+        1. Executive Summary & Context: Introduces the report domain (Peruvian Regional Government).
+        2. Interactive Rule Engine: A live 'Calculator' where users can adjust variables to see eligibility real-time. This demonstrates the '1-sol cliff' and 'recency override' interactively.
+        3. Implementation Modeling: A tabbed interface showing how the same logic is coded via Simple IF, Ladder, and Nested structures.
+        4. Household Tracing: A card-based display of the report's test cases (Households 1, 2, and 3).
+        5. Impact & Fairness Analysis: A data-driven section using Chart.js to visualize the welfare cliff and dependency relationships.
+    -->
+
+    <div class="max-w-6xl mx-auto">
+        
+        <!-- Header Section -->
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-teal-900 mb-4">Emergency Water Grant Logic Explorer</h1>
+            <p class="text-lg text-teal-700 max-w-3xl mx-auto">
+                An interactive analysis of automated eligibility systems used by regional governments in Peru. Explore how code transforms human need into binary outcomes.
+            </p>
+        </header>
+
+        <!-- Section: Interactive Rule Engine -->
+        <section class="mb-16 bg-white p-6 md:p-10 rounded-2xl shadow-sm border border-orange-100">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-teal-800 mb-2">1. Interactive Eligibility Engine</h2>
+                <p class="text-gray-600 italic">Adjust the parameters below to see the automated decision system in action. This engine implements the government's official logic gates.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div>
+                        <label for="input-income" class="block text-sm font-semibold text-gray-700 mb-1">Monthly Income (Soles): <span id="val-income" class="text-teal-600 font-bold">800</span></label>
+                        <input type="range" id="input-income" title="Monthly Income (Soles)" min="0" max="3000" step="10" value="800" class="w-full h-2 bg-teal-100 rounded-lg appearance-none cursor-pointer">
+                        <div class="flex justify-between text-xs text-gray-400 mt-1"><span>0</span><span>1500</span><span>3000</span></div>
+                    </div>
+
+                    <div>
+                        <label for="input-deps" class="block text-sm font-semibold text-gray-700 mb-1">Number of Dependants: <span id="val-deps" class="text-teal-600 font-bold">2</span></label>
+                        <input type="range" id="input-deps" title="Number of Dependants" min="0" max="12" step="1" value="2" class="w-full h-2 bg-teal-100 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div>
+                        <label for="input-water" class="block text-sm font-semibold text-gray-700 mb-1">Water Access Score (1-10): <span id="val-water" class="text-teal-600 font-bold">5</span></label>
+                        <input type="range" id="input-water" title="Water Access Score (1-10)" min="1" max="10" step="1" value="5" class="w-full h-2 bg-teal-100 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <div class="flex gap-8">
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="input-drought" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-600"></div>
+                            <span class="ml-3 text-sm font-medium text-gray-700">In Drought Area</span>
+                        </label>
+
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="input-prior" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                            <span class="ml-3 text-sm font-medium text-gray-700">Prior Grant (< 12 mo)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-teal-50 rounded-xl p-8 border-2 border-dashed border-teal-200 text-center">
+                    <h3 class="text-sm uppercase tracking-widest text-teal-600 font-bold mb-2">Automated Determination</h3>
+                    <div id="result-status" class="text-4xl font-extrabold mb-4">---</div>
+                    <p id="result-reason" class="text-gray-600 text-sm leading-relaxed italic">Adjust sliders to calculate result...</p>
+                    
+                    <div id="cliff-warning" class="hidden mt-6 p-3 bg-orange-100 text-orange-800 text-xs rounded border border-orange-200">
+                        <strong>⚠️ Fairness Gap Detected:</strong> You are currently at a "Welfare Cliff." A single sol increase in income here would result in total loss of benefits.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Modeling Comparison -->
+        <section class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-teal-800 mb-2">2. Implementation Architectures</h2>
+                <p class="text-gray-600">The same government rules can be built using different logical structures. Compare how these code patterns organize the decision flow.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="logic-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                    <h3 class="font-bold text-lg mb-2 text-teal-700">Simple IF Structure</h3>
+                    <p class="text-sm text-gray-500 mb-4 flex-grow">Linear execution. Each rule checks independently. Final rules (like the 12-month ban) must overwrite previous results.</p>
+                    <div class="code-block text-[0.7rem]">
+                        if income < 800:<br>
+                        &nbsp;&nbsp;status = "Full"<br>
+                        if income <= 1600...:<br>
+                        &nbsp;&nbsp;status = "Partial"<br>
+                        if prior_grant <= 12:<br>
+                        &nbsp;&nbsp;status = "Declined"
+                    </div>
+                </div>
+
+                <div class="logic-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                    <h3 class="font-bold text-lg mb-2 text-teal-700">If-Else-If Ladder</h3>
+                    <p class="text-sm text-gray-500 mb-4 flex-grow">Efficient and hierarchical. The first matching condition wins. Prioritizes the disqualification rule at the top.</p>
+                    <div class="code-block text-[0.7rem]">
+                        if prior_grant <= 12:<br>
+                        &nbsp;&nbsp;return "Declined"<br>
+                        elif income < 800:<br>
+                        &nbsp;&nbsp;return "Full"<br>
+                        elif partial_rules:<br>
+                        &nbsp;&nbsp;return "Partial"
+                    </div>
+                </div>
+
+                <div class="logic-card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                    <h3 class="font-bold text-lg mb-2 text-teal-700">Nested IFs</h3>
+                    <p class="text-sm text-gray-500 mb-4 flex-grow">Filters by group. First checks the "Gatekeeper" rule (Recency), then nests sub-logic for amount levels inside.</p>
+                    <div class="code-block text-[0.7rem]">
+                        if no_prior_grant:<br>
+                        &nbsp;&nbsp;if income < 800:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;status = "Full"<br>
+                        &nbsp;&nbsp;else:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;check_partial_logic()<br>
+                        else:<br>
+                        &nbsp;&nbsp;status = "Declined"
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Household Traces -->
+        <section class="mb-16">
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-teal-800 mb-2">3. Historical Test Cases (Trace Analysis)</h2>
+                <p class="text-gray-600">Tracing how specific household profiles from the Source Report interact with the logic gates.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Case 1 -->
+                <div class="bg-white border-t-4 border-emerald-500 p-6 rounded-b-xl shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs font-bold uppercase text-emerald-600">Household 1</span>
+                        <span class="status-badge status-full">Full Grant</span>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                        <li><strong>Income:</strong> 700 Soles</li>
+                        <li><strong>Dependants:</strong> 2</li>
+                        <li><strong>Prior Grant:</strong> None</li>
+                    </ul>
+                    <p class="text-xs italic border-t pt-2 text-gray-400">Logic Pathway: Passed initial ban check; triggered Rule 1 (<800 income).</p>
+                </div>
+
+                <!-- Case 2 -->
+                <div class="bg-white border-t-4 border-amber-500 p-6 rounded-b-xl shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs font-bold uppercase text-amber-600">Household 2</span>
+                        <span class="status-badge status-partial">Partial Grant</span>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                        <li><strong>Income:</strong> 1200 Soles</li>
+                        <li><strong>Dependants:</strong> 5</li>
+                        <li><strong>Prior Grant:</strong> None</li>
+                    </ul>
+                    <p class="text-xs italic border-t pt-2 text-gray-400">Logic Pathway: Fails Rule 1; Matches Rule 2 (Income range + Deps > 4).</p>
+                </div>
+
+                <!-- Case 3 -->
+                <div class="bg-white border-t-4 border-red-500 p-6 rounded-b-xl shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <span class="text-xs font-bold uppercase text-red-600">Household 3</span>
+                        <span class="status-badge status-declined">Declined</span>
+                    </div>
+                    <ul class="text-sm text-gray-600 space-y-2 mb-4">
+                        <li><strong>Income:</strong> 600 Soles</li>
+                        <li><strong>Dependants:</strong> 6</li>
+                        <li><strong>Prior Grant:</strong> 8 Months Ago</li>
+                    </ul>
+                    <p class="text-xs italic border-t pt-2 text-gray-400 font-semibold text-red-400">Logic Pathway: Disqualified immediately by Rule 4 override despite severe poverty.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Fairness Analysis -->
+        <section class="mb-16 bg-teal-950 text-white p-8 md:p-12 rounded-3xl">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-6">4. Socio-Economic Impact Analysis</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-teal-400 font-bold text-lg mb-2">The "1-Sol" Benefit Cliff</h3>
+                            <p class="text-gray-300 text-sm leading-relaxed">
+                                Our data visualization shows a sharp drop in support at exactly 800 soles. A household earning 799 qualifies for full aid, while earning just 1 sol more strips away that status entirely. This binary threshold creates a poverty trap where small economic improvements lead to net losses in household security.
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-teal-400 font-bold text-lg mb-2">Recency vs. Severity</h3>
+                            <p class="text-gray-300 text-sm leading-relaxed">
+                                The logic prioritizes "Grant Recency" over "Crisis Severity." As seen in Household 3, even families in extreme drought with low water access scores are rejected if they received aid within the last year, ignoring the cumulative impact of ongoing disasters.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="bg-white rounded-xl p-4">
+                        <div class="chart-container">
+                            <canvas id="impactChart"></canvas>
+                        </div>
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-4 italic">Chart: Projected Grant Value vs. Household Income (Fixed: 2 Dependants, No Drought)</p>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center py-10 border-t border-gray-200">
+            <p class="text-gray-500 text-sm">&copy; 2024 Regional Water Grant Analysis | Data Ethics & Information Architecture Study</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Data and State
+        const ui = {
+            income: document.getElementById('input-income'),
+            deps: document.getElementById('input-deps'),
+            water: document.getElementById('input-water'),
+            drought: document.getElementById('input-drought'),
+            prior: document.getElementById('input-prior'),
+            valIncome: document.getElementById('val-income'),
+            valDeps: document.getElementById('val-deps'),
+            valWater: document.getElementById('val-water'),
+            resStatus: document.getElementById('result-status'),
+            resReason: document.getElementById('result-reason'),
+            cliffWarning: document.getElementById('cliff-warning')
+        };
+
+        // Logic Engine Implementation
+        function calculateEligibility() {
+            const income = parseInt(ui.income.value);
+            const deps = parseInt(ui.deps.value);
+            const water = parseInt(ui.water.value);
+            const inDrought = ui.drought.checked;
+            const hadPrior = ui.prior.checked;
+
+            ui.valIncome.innerText = income;
+            ui.valDeps.innerText = deps;
+            ui.valWater.innerText = water;
+
+            let status = "Declined";
+            let reason = "None of the eligibility criteria were met.";
+            let isCliff = false;
+
+            // Decision Logic
+            if (hadPrior) {
+                status = "Declined";
+                reason = "Disqualified due to a prior grant received within the past 12 months.";
+            } else if (income < 800) {
+                status = "Full Grant";
+                reason = "Qualifies because monthly income is below the 800 Soles threshold.";
+                if (income > 780) isCliff = true;
+            } else if (income >= 800 && income <= 1600 && deps > 4) {
+                status = "Partial Grant";
+                reason = "Qualifies for partial aid (Condition A): Income 800-1600 with > 4 dependants.";
+            } else if (inDrought && water < 3) {
+                status = "Partial Grant";
+                reason = "Qualifies for partial aid (Condition B): Emergency drought area with low water access score (< 3).";
+            }
+
+            // UI Updates
+            ui.resStatus.innerText = status;
+            ui.resStatus.className = "text-4xl font-extrabold mb-4 " + 
+                (status === "Full Grant" ? "text-emerald-600" : status === "Partial Grant" ? "text-amber-500" : "text-red-500");
+            
+            ui.resReason.innerText = reason;
+            
+            if (isCliff) {
+                ui.cliffWarning.classList.remove('hidden');
+            } else {
+                ui.cliffWarning.classList.add('hidden');
+            }
+        }
+
+        // Chart.js Visualization
+        function initChart() {
+            const ctx = document.getElementById('impactChart').getContext('2d');
+            const labels = [400, 600, 799, 801, 1000, 1200, 1400, 1600, 1800, 2000];
+            
+            // Value proxy: Full = 100, Partial = 40, Declined = 0
+            const values = labels.map(inc => {
+                if (inc < 800) return 100; // Full
+                return 0; // Declined (assuming deps = 2, drought = false)
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.map(l => l + ' S/'),
+                    datasets: [{
+                        label: 'Grant Value Index',
+                        data: values,
+                        borderColor: '#0d9488',
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        fill: true,
+                        stepped: true,
+                        tension: 0,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#0d9488'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    if (context.parsed.y === 100) return "Outcome: Full Grant";
+                                    return "Outcome: Declined";
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 120,
+                            ticks: {
+                                callback: (value) => value === 100 ? 'Full' : value === 40 ? 'Partial' : value === 0 ? 'None' : ''
+                            }
+                        },
+                        x: {
+                            title: { display: true, text: 'Income Level' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize
+        [ui.income, ui.deps, ui.water, ui.drought, ui.prior].forEach(el => {
+            el.addEventListener('input', calculateEligibility);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateEligibility();
+            initChart();
+        });
+    </script>
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cognitive Analysis & Strategic Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfcfb;
+            color: #2d3436;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .tab-active {
+            border-bottom: 2px solid #d4a373;
+            color: #d4a373;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Chosen Palette: Warm Neutrals (Desert Sand, Charcoal, Pearl) -->
+    <!-- Application Structure Plan: 
+        The SPA is organized into four functional modules: 
+        1. 'The Mindset Audit' (Visualizing biases and assumptions from the report).
+        2. 'Bottleneck Calculator' (An interactive tool for the user to input their 10-hour breakdown, which dynamically updates a chart to prove/disprove the hardware bottleneck).
+        3. 'Strategic Roadmap' (A phased exploration of the Lean Workflow method).
+        4. 'Comparison' (The summary matrix).
+        This structure was chosen to move the user from 'Passive Reading' to 'Active Calculation', forcing a confrontation with the data before presenting the solution.
+    -->
+    <!-- Visualization & Content Choices: 
+        - Pie Chart (Chart.js): Visualizing time allocation to highlight the 'Human vs. Machine' gap.
+        - Bar Chart (Chart.js): Comparing the ROI of Hardware Buy vs. Workflow Audit.
+        - Interaction: Users can toggle between report insights and dynamic calculators.
+        - Confirmation: NO SVG graphics used. NO Mermaid JS used.
+    -->
+
+    <nav class="sticky top-0 z-50 glass-card border-b py-4 px-6">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-stone-800">Creator Decision Dashboard</h1>
+            <div class="space-x-6 hidden md:flex">
+                <button onclick="scrollToSection('analysis')" class="hover:text-amber-700 transition">Cognitive Analysis</button>
+                <button onclick="scrollToSection('calculator')" class="hover:text-amber-700 transition">Time Audit</button>
+                <button onclick="scrollToSection('roadmap')" class="hover:text-amber-700 transition">Lean Roadmap</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        
+        <header class="mb-12 text-center">
+            <h2 class="text-4xl font-bold text-stone-900 mb-4">Deconstructing the Production Bottleneck</h2>
+            <p class="text-lg text-stone-600 max-w-2xl mx-auto">Analyze the logic behind spending your savings on a new computer and explore a process-oriented path to consistent posting.</p>
+        </header>
+
+        <!-- Section: Cognitive Analysis -->
+        <section id="analysis" class="mb-16">
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <span class="bg-amber-100 text-amber-700 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">01</span>
+                    Examining Your Thinking
+                </h3>
+                <p class="text-stone-600 mb-8">Identify the invisible cognitive factors steering your current $3,000 solution. Hover over the factors to reveal their impact on your decision.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-6 rounded-xl border border-stone-100 bg-stone-50 hover:bg-amber-50 transition cursor-default">
+                        <h4 class="font-bold text-stone-800 mb-2">Hardware Bottleneck Assumption</h4>
+                        <p class="text-sm text-stone-600">The belief that CPU/GPU lag is the *primary* driver of your 10-hour editing sessions.</p>
+                    </div>
+                    <div class="p-6 rounded-xl border border-stone-100 bg-stone-50 hover:bg-amber-50 transition cursor-default">
+                        <h4 class="font-bold text-stone-800 mb-2">Substitution Bias</h4>
+                        <p class="text-sm text-stone-600">Swapping the complex task of "fixing my workflow" for the simple task of "buying a product."</p>
+                    </div>
+                    <div class="p-6 rounded-xl border border-stone-100 bg-stone-50 hover:bg-amber-50 transition cursor-default">
+                        <h4 class="font-bold text-stone-800 mb-2">Ostrich Effect</h4>
+                        <p class="text-sm text-stone-600">Ignoring how much time is spent on non-technical tasks like clip selection and indecision.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Interactive Calculator -->
+        <section id="calculator" class="mb-16">
+            <div class="gradient-bg p-8 rounded-2xl shadow-md">
+                <h3 class="text-2xl font-semibold mb-2">Interactive Time Audit</h3>
+                <p class="text-stone-600 mb-8">Input your estimated hours for a single video to see the real impact of a hardware upgrade vs. process optimization.</p>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="humanTime" class="block text-sm font-medium text-stone-700 mb-2">Human Tasks (Cutting, Scripting, Sourcing)</label>
+                            <input type="range" id="humanTime" min="1" max="15" value="8" title="Human Tasks hours" class="w-full h-2 bg-stone-300 rounded-lg appearance-none cursor-pointer accent-amber-600" oninput="updateAudit()">
+                            <div class="flex justify-between text-xs text-stone-500 mt-1"><span id="humanVal">8</span> hours</div>
+                        </div>
+                        <div>
+                            <label for="systemTime" class="block text-sm font-medium text-stone-700 mb-2">System Tasks (Rendering, Lag, Exporting)</label>
+                            <input type="range" id="systemTime" min="0.5" max="5" step="0.5" value="2" title="System Tasks hours" class="w-full h-2 bg-stone-300 rounded-lg appearance-none cursor-pointer accent-amber-600" oninput="updateAudit()">
+                            <div class="flex justify-between text-xs text-stone-500 mt-1"><span id="systemVal">2</span> hours</div>
+                        </div>
+                        <div class="p-4 bg-white/50 rounded-lg border border-white/20">
+                            <p class="text-sm italic text-stone-700">"If a new PC cuts render time by 80%, you only save <span id="savingsCalc" class="font-bold text-amber-700">1.6</span> hours. Where will the rest of the 5-hour reduction come from?"</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-inner">
+                        <div class="chart-container">
+                            <canvas id="auditChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Strategic Roadmap -->
+        <section id="roadmap" class="mb-16">
+            <h3 class="text-2xl font-semibold mb-8 text-center">The Lean Workflow Method</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Phase 1 -->
+                <div class="relative p-6 glass-card rounded-2xl border-t-4 border-amber-400">
+                    <span class="absolute -top-4 left-6 bg-amber-400 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">Phase 1</span>
+                    <h4 class="text-xl font-bold mb-4 mt-2">Root Cause Audit</h4>
+                    <ul class="text-sm text-stone-600 space-y-3">
+                        <li class="flex items-start">
+                            <span class="mr-2">⏱️</span>
+                            <span>Keep a 15-minute increment log for one full edit.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2">📊</span>
+                            <span>Separate A-Roll, B-Roll, and System Latency.</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Phase 2 -->
+                <div class="relative p-6 glass-card rounded-2xl border-t-4 border-amber-500">
+                    <span class="absolute -top-4 left-6 bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">Phase 2</span>
+                    <h4 class="text-xl font-bold mb-4 mt-2">Process Fixes</h4>
+                    <ul class="text-sm text-stone-600 space-y-3">
+                        <li class="flex items-start">
+                            <span class="mr-2">📄</span>
+                            <span>Tighten scripts before filming to reduce "bad takes."</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2">⚡</span>
+                            <span>Learn Proxy Editing to remove lag on current hardware.</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Phase 3 -->
+                <div class="relative p-6 glass-card rounded-2xl border-t-4 border-amber-600">
+                    <span class="absolute -top-4 left-6 bg-amber-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">Phase 3</span>
+                    <h4 class="text-xl font-bold mb-4 mt-2">Constraint Test</h4>
+                    <ul class="text-sm text-stone-600 space-y-3">
+                        <li class="flex items-start">
+                            <span class="mr-2">⚖️</span>
+                            <span>Apply the 80/20 rule: limit to 3 cuts per minute.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="mr-2">💰</span>
+                            <span>Protect savings for content/review units.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Summary Matrix -->
+        <section id="matrix" class="mb-16">
+            <div class="overflow-x-auto rounded-2xl border border-stone-200">
+                <table class="w-full text-left bg-white">
+                    <thead class="bg-stone-800 text-white">
+                        <tr>
+                            <th class="px-6 py-4">Approach</th>
+                            <th class="px-6 py-4">Financial Risk</th>
+                            <th class="px-6 py-4">Est. Time Saved</th>
+                            <th class="px-6 py-4">Outcome</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        <tr>
+                            <td class="px-6 py-4 font-semibold">The Hardware Buy</td>
+                            <td class="px-6 py-4 text-red-600">High ($$$$)</td>
+                            <td class="px-6 py-4">0.5 - 1.5 Hours</td>
+                            <td class="px-6 py-4 italic text-stone-500">Treats the symptom (Render time)</td>
+                        </tr>
+                        <tr class="bg-amber-50">
+                            <td class="px-6 py-4 font-semibold text-amber-900">The Lean Audit</td>
+                            <td class="px-6 py-4 text-green-600 font-bold">Zero ($0)</td>
+                            <td class="px-6 py-4 font-bold text-amber-900">4.0 - 6.0 Hours</td>
+                            <td class="px-6 py-4 italic text-stone-600 font-medium">Treats the root cause (Workflow)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-12 px-6 mt-20">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-sm mb-4">Strategic Framework based on Cognitive Bias & Lean Methodology Analysis.</p>
+            <div class="text-xs space-y-1">
+                <p>CONFIRMATION: NO SVG graphics used.</p>
+                <p>CONFIRMATION: NO Mermaid JS used.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let auditChart;
+
+        function initChart() {
+            const ctx = document.getElementById('auditChart').getContext('2d');
+            auditChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Human Workflow', 'System Latency'],
+                    datasets: [{
+                        data: [8, 2],
+                        backgroundColor: ['#d4a373', '#2d3436'],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + ' hours';
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function updateAudit() {
+            const human = parseFloat(document.getElementById('humanTime').value);
+            const system = parseFloat(document.getElementById('systemTime').value);
+            
+            document.getElementById('humanVal').innerText = human;
+            document.getElementById('systemVal').innerText = system;
+            
+            // Assume hardware can only fix system tasks, cutting them by 80%
+            const savings = (system * 0.8).toFixed(1);
+            document.getElementById('savingsCalc').innerText = savings;
+
+            auditChart.data.datasets[0].data = [human, system];
+            auditChart.update();
+        }
+
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize everything
+        window.onload = () => {
+            initChart();
+            updateAudit();
+        };
+    </script>
+</body>
+</html>
